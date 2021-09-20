@@ -1,0 +1,156 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PROGVI01.
+       AUTHOR. VITORIA CALDAS.
+      * MEU PRIMEIRO PROGRAMA COBOL 20/04/2020
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SPECIAL-NAMES.
+            DECIMAL-POINT IS COMMA.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+            SELECT ARQE002 ASSIGN ENTRADA.
+            SELECT ARQE005 ASSIGN SAIDA5.
+            SELECT ARQS006 ASSIGN SAIDA6.
+            SELECT ARQS007 ASSIGN SAIDA7.
+       DATA DIVISION.
+       FILE SECTION.
+       FD   ARQE002
+            LABEL RECORD IS STANDARD
+            RECORDING MODE IS F.
+            RECORD CONTAINS 100 CHARACTERS.
+       01   REG-ARQE002.
+            03 MAT-E               PIC 9(06).
+            03 NOME-E              PIC X(20).
+            03 TURNO-E             PIC X(01).
+            03 SERIE-E             PIC X(02).
+            03 TURMA-E             PIC 9(02).
+            03 MATER-E             PIC X(20).
+            03 NOTAS-E             PIC 9(02)V99 OCCURS 6 TIMES.
+            03 FILER               PIC X(25).
+       FD   ARQS005
+            LABEL RECORD IS STANDARD
+            RECORDING MODE IS F.
+            RECORD CONTAINS 100 CHARACTERS.
+       01   REG-ARQS005.
+            03 MAT-S5              PIC 9(06).
+            03 NOME-S5             PIC X(20).
+            03 TURNO-S5            PIC X(01).
+            03 SERIE-S5            PIC X(02).
+            03 TURMA-S5            PIC X(02).
+            03 MATER-S5            PIC X(20).
+            03 MED-S5              PIC 9(02)V99.
+            03 SIT-S5              PIC X(03).
+            03 FILLER              PIC X(42).
+       FD   ARQS006
+            LABEL RECORD IS STANDARD
+            RECORDING MODE IS F
+            RECORD CONTAINS 100 CHARACTERS.
+       01   REG-ARQS006.
+            03 MAT-S6              PIC 9(06).
+            03 NOME-S6             PIC X(20).
+            03 TURNO-S6            PIC X(01).
+            03 SERIE-S6            PIC X(02).
+            03 TURMA-S6            PIC X(02).
+            03 MATER-S6            PIC X(20).
+            03 MED-S6              PIC X(02)V99.
+            03 SIT-S6              PIC X(03).
+            03 FILLER              PIC X(42).
+       FD   ARQS007
+            LABEL RECORD IS STANDARD
+            RECORDING MODE IS F
+            RECORD CONTAINS 100 CHARACTERS.
+       01   RE-ARQS007.
+            03 MAT-S7              PIC 9(06).
+            03 NOME-S7             PIC X(20).
+            03 TURNO-S7            PIC X(01).
+            03 SERIE-S7            PIC X(02).
+            03 TURMA-S7            PIC X(02).
+            03 MATER-S7            PIC X(20).
+            03 MED-S7              PIC 9(02).
+            03 SIT-S7              PIC X(03).
+            03 FILLER              PIC X(42).
+       WORKING-STORAGE SECTION.
+       77   WS-DATA               PIC 9(06).
+       77   WS-DATAR              PIC 9(08).
+       77   WS-MEDIA              PIC 9(08)       VALUE ZEROS.
+       77   WS-APR                PIC 9(02)       VALUE ZEROS.
+       77   WS-REC                PIC 9(02)       VALUE ZEROS.
+       77   WS-REP                PIC 9(02)       VALUE ZEROS.
+       77   WS-CONT               PIC 9(02)       VALUE ZEROS.
+       77   WS-FIM                PIC 9(01)       VALUE ZEROS.
+       PROCEDURE DIVISION.
+            PERFORM 100-INICIO      THRU 100-S.
+            PERFORM 200-PROC        THRU 200-S UNTIL WS-FIM = 1.
+            PERFORM 300-FINAL       THRU 300-S.
+            STOP RUN.
+       100-INICIO.
+           ACCEPT WS-DATA FROM DATE.
+           STRING WS-DATA(5:2) '.'
+                  WS-DATA(3:2) '.'
+                  WS-DATA(1:2)
+           DELIMITED BY SIZE INTO WS-DATAR.
+           DISPLAY 'INICIO DO PROGRAMA'.
+           DISPLAY '..................'.
+           DISPAY  'DATA PROC.: WS-DATAR.
+           OPEN INPUT ARQE002
+                OUTPUT ARQS005
+                OUTPUT ARQS006
+                OUTPUT ARQS007.
+           READ ARQE002 AT END DISPLAY '** ARQUIVO VAZIO ** ' STOP RUN.
+       100-S.
+           EXIT.
+       200-PROC.
+           COMPUTE WS-MEDIA = (NOTAS-E(1) * 1,5 + NOTAS-E(2) * 1,5 +
+                               NOTA-E(3) * 2 + NOTAS-E(4) * 2 +
+                               NOTAS-E(5) * 2 + NOTAS-E(6) * 1) / 10
+           IF WS-NEDIA >= 7
+              MOVE 'A'      TO SIT-S5
+              MOVE WS-MEDIA TO MED-S5
+              MOME MAT-E    TO MAT-S5
+              MOVE NOME-E   TO NOME-S5
+              MOVE TURNO-E  TO TURNO-S5
+              MOVE SERIE-E  TO SERIE-S5
+              MOVE TURMA-E  TO TURMA-S5
+              MOVE MATER-E  TO MATER-S5
+              ADD 1 TO WS-APR
+           ELSE
+              IF WS-MEDIA < 5
+                 MOVE 'R' TO  SIT-S7
+                 MOVE WS-MEDIA TO  MED-S7
+                 MOVE MAT-E    TO  MAT-S7
+                 MOVE TURNO-E  TO  TURNO-S7
+                 MOVE SERIE-E  TO  SERIE-S7
+                 MOVE TURMA-E  TO  TURMA-S7
+                 MOVR MATER-E  TO  MATER-S7
+                 ADD 1 TO WS-REP
+                 WRITE REG-ARQS007.
+              ELSE
+                 MOVE 'E'       TO  SIT-S6
+                 MOVE  WS-MEDIA TO  MED-S6
+                 MOVE  MAT-E    TO  MAT-S6
+                 MOVE  NOME-E   TO  NOME-S6
+                 MOVE  TURNO-E  TO  TURNO-S6
+                 MOVE  SERIE-E  TO  SERIE-S6
+                 MOVE  TURMA-E  TO  TURMA-S6
+                 MOVE  MATER-E  TO  MATER-S6
+                 ADD 1 TO WS-REC
+                 WRITE REG-ARQS006
+              END-IF
+           END-IF
+           READ  ARQE002 AT END MOVE 1 TO WS-FIM.
+       200-S.
+           EXIT.
+       300-FINAL.
+           COMPUTE WS-CONT = WS-APR + WS-REP + WS-REC
+           DISPLAY ' TOTAL ALUNOS             : ' WS-CONT.
+           DISPLAY ' TOTAL APROVADOS          : ' WS-APR.
+           DISPLAY ' TOTAL REPROVADOS         : ' WS-REP.
+           DISPLAY ' TOTAL RECUPERACAO        : ' WS-REC.
+           DISPLAY ' .................................'.
+           DISPLAY ' FINAL DO PROCESSAMENT0'.
+           CLOSE ARQE002
+                 ARQS005
+                 ARQS006
+                 ARQS007.
+       300-S.
+           EXIT.
